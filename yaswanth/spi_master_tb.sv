@@ -1,4 +1,4 @@
-module tb;
+module spi_master_tb;
 
     // Testbench signals
     logic clk_i;
