@@ -73,7 +73,7 @@ module RRA_Top #(
 
 
     // Generate ARB_STATUS register
-    always_comb //f @(posedge Pclk_i or negedge PResetn_i)
+    always_comb
 	 begin
         if (!PResetn_i) begin
             ARB_STATUS = 32'h0;
