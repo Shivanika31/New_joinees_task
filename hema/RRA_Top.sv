@@ -32,12 +32,13 @@ module RRA_Top #(
     logic [NUM_REQUESTS-1:0] rra_gnt;      // Internal grant signal
 
     // Instantiate the RRA module
-    RRA #(.NUM_REQUESTS(NUM_REQUESTS)) rra_inst (
+    RRA #(.NUM_REQUESTS(NUM_REQUESTS)) rra_inst
+   (
         .clk_i(Pclk_i),
         .rstn_i(PResetn_i),
         .req_i(req_i),
-		  .timeoutperiod_i(timeout_period),
-		  .gnt_o(rra_gnt)
+        .timeoutperiod_i(timeout_period),
+	.gnt_o(rra_gnt)
                                           // RRA module drives internal rra_gnt
     );
 
