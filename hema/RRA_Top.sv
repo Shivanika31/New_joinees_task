@@ -73,34 +73,35 @@ module RRA_Top #(
 
 
     // Generate ARB_STATUS register
-  always_ff @(posedge Pclk_i or negedge PResetn_i) begin
-    if (!PResetn_i) begin
-        // Reset everything
-        ARB_STATUS <= 32'h0;
-        pending_requests <= 8'h0;
-        current_grant <= 8'hFF; // Default value: No grant
-    end else begin
-        // Count the active requests in req_i
-        pending_requests = 0;
-        for (int i = 0; i < NUM_REQUESTS; i++) begin
-            if (req_i[i]) pending_requests += 1;
-        end
-
-        // Update current_grant based on rra_gnt
-        current_grant = 8'h0; // Default: No active grant
-        for (int i = 0; i < NUM_REQUESTS; i++) begin
-            if (rra_gnt[i]) begin
-                current_grant = i[7:0]; // Update with the granted request index
-                break; // Exit loop after finding the first active grant
+    always_comb //f @(posedge Pclk_i or negedge PResetn_i)
+	 begin
+        if (!PResetn_i) begin
+            ARB_STATUS = 32'h0;
+            pending_requests = 8'h0;
+            current_grant = 8'h0;
+        end else begin
+            // Count pending requests
+            pending_requests = 0;
+            for (int i = 0; i < NUM_REQUESTS; i++) begin
+                if (req_i[i])
+                    pending_requests += 1 ;
             end
+				     pending_requests = pending_requests-8'h1; 
+
+
+            // Find the current grant index
+            current_grant = 8'h0;
+            for (int i = 0; i < NUM_REQUESTS; i++) begin
+                if (rra_gnt[i]) begin
+                     current_grant = (i + 1) % 256; // Mask to 8 bits
+                     break;
+                end
+            end
+
+            // Update ARB_STATUS with 32-bit concatenation
+            ARB_STATUS = {16'b0, current_grant, pending_requests[7:0]};
         end
-
-        // Update ARB_STATUS
-        ARB_STATUS <= {16'b0, current_grant, pending_requests};
     end
-end
-
-
 
     // Update ARB_CTRL dynamically
     always_comb begin
@@ -110,9 +111,9 @@ end
 	 begin
         
             if (&enable) 
-                gnt_o <= rra_gnt;  // Forward the grants when enabled
+                gnt_o = rra_gnt;  // Forward the grants when enabled
             else 
-                gnt_o <= 0; // Disable grant signals if arbiter is disabled
+                gnt_o = 0; // Disable grant signals if arbiter is disabled
         end 
 	 
 endmodule
