@@ -30,12 +30,23 @@ module RRA_Top #(
     logic [NUM_REQUESTS-1:0] rra_gnt;        // Internal grant signal
 
     // Instantiate the RRA module
+<<<<<<< HEAD
     RRA #(.NUM_REQUESTS(NUM_REQUESTS)) rra_inst (
         .clk_i(Pclk_i),                      // Clock signal
         .rstn_i(PResetn_i),                  // Reset signal
         .req_i(req_i),                        // Request signals from clients
         .timeoutperiod_i(timeout_period),     // Timeout period
         .gnt_o(rra_gnt)                       // Grant output from RRA module
+=======
+    RRA #(.NUM_REQUESTS(NUM_REQUESTS)) rra_inst
+   (
+        .clk_i(Pclk_i),
+        .rstn_i(PResetn_i),
+        .req_i(req_i),
+        .timeoutperiod_i(timeout_period),
+	.gnt_o(rra_gnt)
+                                          // RRA module drives internal rra_gnt
+>>>>>>> 5ecb1c2639c1cd63237cd76d37e60ddc50f44e26
     );
 
     // Register write/read logic
@@ -99,6 +110,7 @@ module RRA_Top #(
     always_comb begin
         ARB_CTRL = {16'b0, timeout_period, enable};               // Concatenate timeout_period and enable values
     end
+<<<<<<< HEAD
 
                                                                   // Update grant signals
     always_comb begin
@@ -108,4 +120,15 @@ module RRA_Top #(
             gnt_o = 0;                                            // Disable grant signals if arbiter is disabled
     end
 
+=======
+	 always_comb 
+	 begin
+        
+            if (&enable) 
+                gnt_o = rra_gnt;       // Forward the grants when enabled
+            else 
+                gnt_o = 0;             // Disable grant signals if arbiter is disabled
+        end 
+	 
+>>>>>>> 5ecb1c2639c1cd63237cd76d37e60ddc50f44e26
 endmodule
