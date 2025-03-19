@@ -9,5 +9,5 @@ module counter(
             count <= 4'b0000; // Reset counter to 0
         else
             count <= count + 1; // Increment counter on each clock cycle
-    end
+    end 
 endmodule
