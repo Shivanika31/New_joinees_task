@@ -1,3 +1,0 @@
-module tb;
-gggg
-endmodule
