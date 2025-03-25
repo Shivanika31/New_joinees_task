@@ -1,14 +1,14 @@
 module spi_master
-(input Pclk,
- input Preset,
- input [5:0]clk_div,
- input[1:0]mode,
+(input logic Pclk,
+ input logic Preset,
+ input logic [5:0]clk_div,
+ input logic [1:0]mode,
 
  //APB INTERFACE
- input [7:0] write_data,
- input write_en,
+ input logic [7:0] write_data,
+ input logic write_en,
  output logic[7:0] read_data,
- input enable,
+ input logic enable,
  
  
  //SPI INTERFACE
@@ -104,7 +104,7 @@ always_comb begin
 state_next=IDLE;
 case(state)
 IDLE:begin
-     if(enable)
+     if(enable && write_en)
      state_next =SHIFT;
      end
 SHIFT:begin
@@ -128,17 +128,20 @@ IDLE:begin
      cs<=1'b1;
      sclk <= 1'b0;
      mosi<=1'b0;
-     if(enable)
-     shift_register<=write_data;
      busy<=1'b0;
      count_reg<=8'd0;
+     if(enable && write_en)
+     begin
+     shift_register<=write_data;
+     busy<=1'b1;
+     end
      end
 SHIFT:begin
        sclk <= 1'b0;
       case(mode)// mode 0 cpol 0,cpha 0
 
       2'b00:begin
-              if(enable && write_en)
+              if(enable)
                begin
           
                  if(neg_edge)//sending data at negedge of sclk
@@ -161,7 +164,7 @@ SHIFT:begin
                 end
             end
         2'b11:begin
-              if(enable && write_en)
+              if(enable)
                begin
                 if(pos_edge)
                  begin
@@ -203,4 +206,5 @@ end
 endmodule
                 
               
+
 
